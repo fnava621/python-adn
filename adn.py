@@ -57,7 +57,7 @@ class Adn:
 
         #must add delete
         method = method.lower()
-        if not method in ('get', 'post'):
+        if not method in ('get', 'post', 'delete'):
             return "ERROR: NOT CORRECT METHOD"
 
         params = params or {}
@@ -66,7 +66,7 @@ class Adn:
         
         url = url + "?access_token=" + self.access_token
 
-        if method == 'get':
+        if method == 'get' or method == 'delete':
             response = func(url, params=params)
         else:
             response = func(url, data=params, files=files)
