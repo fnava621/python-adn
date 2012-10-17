@@ -1,0 +1,18 @@
+Python-Adn is an easy way to access ADN data in Python.
+
+app = Adn(access_token="your access token")
+
+app.getUser(user_id=1)
+
+*show results
+
+app.createPost(text="test-adn-python") => https://alpha.app.net/nava/post/1009559
+
+
+If you would like to authenticate with you client_token.
+
+app = Adn(client_secret="your client_secret", client_id="Your client id")
+
+app.access_token = Adn.getClientToken() 
+
+ 
