@@ -15,4 +15,8 @@ app = Adn(client_secret="your client_secret", client_id="Your client id")
 
 app.access_token = Adn.getClientToken() 
 
+app.getUser(user_id=2)
+
+app.createPost
+
  
