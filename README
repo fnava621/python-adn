@@ -1,4 +1,4 @@
-Python-Adn is an easy way to access ADN data in Python.
+Python-Adn is an easy way to access ADN data.
 
 app = Adn(access_token="your access token")
 
