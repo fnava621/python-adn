@@ -54,8 +54,6 @@ class Adn:
 
     def _request(self, url, method='GET', params=None, files=None, api_call=None):
 
-
-        #must add delete
         method = method.lower()
         if not method in ('get', 'post', 'delete'):
             return "ERROR: NOT CORRECT METHOD"
@@ -84,17 +82,7 @@ class Adn:
             'content': content,
         }
 
-
-        #  wrap the json loads in a try, and defer an error
-        #  why? twitter will return invalid json with an error code in the headers
-        json_error = False
-        try:
-            content = json.loads(content)
-        except ValueError:
-            json_error= True
-            content= {}
-
-        #Add Error Handling
+        content = json.loads(content)
 
         return content
 
