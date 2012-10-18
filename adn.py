@@ -3,6 +3,7 @@
    Aims to abstract away all the API endpoints
 
    I love talking to people. If you have any questions or comments: fnava621@gmail.com or @nava
+
 """
 
 __author__  = "Fernando Nava <fnava621@gmail.com>"
@@ -43,8 +44,7 @@ class Adn:
         fn = api_table[api_call]
         url = re.sub(
             '\{\{(?P<m>[a-zA-Z_]+)\}\}',
-            # The '1' here catches the API version. Slightly hilarious.
-            lambda m: "%s" % kwargs.get(m.group(1), '1'),
+            lambda m: "%s" % kwargs.get(m.group(1)),
             base_url + fn['url']
         )
 
