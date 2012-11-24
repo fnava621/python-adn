@@ -25,7 +25,8 @@ class Adn:
         self.client_secret     = client_secret
         self.redirect_uri      = redirect_uri
         self.access_token      = access_token
-        self.api_anchor        = 'https://alpha.app.net/%s'
+        self.oauth_anchor      = 'https://alpha.app.net/%s'
+        self.api_anchor        = 'https://alpha.app.net/stream/0/%s'
         self.accepted_scope    = ['stream', 'email', 'write_post', 'follow', 'messages', 'export']
         self.scope             = ' '.join([type_scope for type_scope in scope if type_scope in self.accepted_scope])
         self.auth_url          = self.getAuthUrl()
@@ -52,23 +53,32 @@ class Adn:
 
         return content
 
-    def _request(self, url, method='GET', params=None, files=None, api_call=None):
+    def _request(self, url, method='GET', params=None, files=None, api_call=None, headers=None, *args, **kwargs):
 
         method = method.lower()
         if not method in ('get', 'post', 'delete'):
             return "ERROR: NOT CORRECT METHOD"
 
         params = params or {}
+        headers = headers or {}
 
         func = getattr(self.client, method)
         
-        url = url + "?access_token=" + self.access_token
-
+        headers['Authorization'] = 'Bearer %s' % self.access_token
+        
         if method == 'get' or method == 'delete':
-            response = func(url, params=params)
+            kwargs['params'] = params
+            
+            #response = func(url, params=params)
         else:
-            response = func(url, data=params, files=files)
+            kwargs.update({
+                    'files': files,
+                    'data': params
+            })
+            
+        response = func(url, headers=headers, *args, **kwargs)
         content = response.content.decode('utf-8')
+
 
         # create stash for last function intel
         self._last_call = {
@@ -85,6 +95,18 @@ class Adn:
         content = json.loads(content)
 
         return content
+
+    def api_request(self, url, *args, **kwargs):
+        url = self.api_anchor % (url,)
+        headers = kwargs.get('headers', {})
+        method = kwargs.get('method', 'get')
+
+        # If we are posting we are probably going to be posting JSON
+        if method == "POST":
+            headers.update({'Content-type': 'application/json'})
+            
+        kwargs['headers'] = headers
+        return self._request(url, *args, **kwargs)
 
 
 
@@ -127,3 +149,22 @@ class Adn:
             r = requests.post(self.request_token_url, data=post_data)
             token = json.loads(r.text)
             return token['access_token']
+
+    def streams(self, *args, **kwargs):
+        return self.api_request('/streams', *args, **kwargs)
+
+    def filters(self, *args, **kwargs):
+        return self.api_request('/filters', *args, **kwargs)
+
+
+def bug(code):
+    post_data = {'client_id': os.environ.get('CLIENT_ID'),
+                     'client_secret': os.environ.get('CLIENT_SECRET'),
+                     'grant_type': 'authorization_code',
+                     'redirect_uri': os.environ.get('REDIRECT_URL'),
+                     'code': code}
+    url = 'https://alpha.app.net/oauth/access_token'
+    
+    r = requests.post(url, data=post_data)
+    return r
+
